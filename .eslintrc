@@ -34,7 +34,12 @@
     "react/prop-types": 0,
     "react/state-in-constructor": 0,
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "prettier/prettier": "error",
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
     "indent": ["error", 2, { "SwitchCase": 1 }],
     "import/no-unresolved": [2, { "caseSensitive": false }],
     "import/order": [
@@ -50,7 +55,8 @@
         ],
         "newlines-between": "always"
       }
-    ]
+    ],
+    "no-underscore-dangle": 0
   },
   "settings": {
     "version": "detect",
