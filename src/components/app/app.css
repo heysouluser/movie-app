@@ -1,4 +1,12 @@
 .movie-app {
   background-color: #fff;
   font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.movie-app > .ant-alert {
+  margin-top: 30px;
+  margin-bottom: 30px;
 }

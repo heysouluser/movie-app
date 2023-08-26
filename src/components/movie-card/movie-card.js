@@ -1,25 +1,18 @@
 import './movie-card.css';
 import { format } from 'date-fns';
 
-function truncate(str, maxLength) {
-  if (str.length <= maxLength) {
-    return str;
-  }
-
-  const spaceIndex = str.indexOf(' ', maxLength);
-
-  return `${str.slice(0, spaceIndex)}...`;
-}
+import truncate from '../../utils/truncate';
 
 function MovieCard(props) {
   const { title, releaseDate, posterPath, overview } = props;
 
   let posterImg = `https://image.tmdb.org/t/p/original${posterPath}`;
+  const emptyImg = 'http://dummyimage.com/183x279/99cccc.gif&text=Empty+pic';
   let formatDate = 'Date unknown';
   let movieOverview = 'Empty description';
 
   if (!posterPath) {
-    posterImg = 'http://dummyimage.com/183x279/99cccc.gif&text=Empty+pic';
+    posterImg = emptyImg;
   }
 
   if (releaseDate) {
