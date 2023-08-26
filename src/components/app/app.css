@@ -6,7 +6,10 @@
   align-items: center;
 }
 
-.movie-app > .ant-alert {
+.movie-app__main > .ant-alert {
   margin-top: 30px;
   margin-bottom: 30px;
+}
+
+.movie-app__main {
 }

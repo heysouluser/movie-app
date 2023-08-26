@@ -1,0 +1,10 @@
+.movie-app__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 36px 36px;
+}
+
+.movie-app__tabs-box {
+  width: 140px;
+}
