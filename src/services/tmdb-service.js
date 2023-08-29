@@ -14,9 +14,8 @@ export default class TMDBService {
     return result;
   }
 
-  async getMovies() {
-    const response = await this.getResource(`search/movie?query=return&api_key=${this.apiKey}`);
-
-    return response.results;
+  async getMovies(search, currentPage) {
+    const response = await this.getResource(`search/movie?query=${search}&page=${currentPage}&api_key=${this.apiKey}`);
+    return response;
   }
 }

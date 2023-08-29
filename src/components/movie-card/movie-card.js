@@ -20,7 +20,7 @@ function MovieCard(props) {
   }
 
   if (overview) {
-    movieOverview = truncate(overview, 210);
+    movieOverview = truncate(overview, 180);
   }
 
   return (

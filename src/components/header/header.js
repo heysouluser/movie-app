@@ -12,13 +12,15 @@ const items = [
   },
 ];
 
-function Header() {
+function Header({ onInputChange }) {
   return (
     <header className="movie-app__header">
       <div className="movie-app__tabs-box">
         <Tabs defaultActiveKey="1" items={items} centered size="large" />
       </div>
-      <Input placeholder="Type to search..." />
+      <div className="movie-app__input-box">
+        <Input placeholder="Type to search..." size="large" onChange={onInputChange} />
+      </div>
     </header>
   );
 }
