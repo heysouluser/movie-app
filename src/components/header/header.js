@@ -12,14 +12,14 @@ const items = [
   },
 ];
 
-function Header({ onInputChange }) {
+function Header({ onInputChange, updateTab, tab }) {
   return (
     <header className="movie-app__header">
       <div className="movie-app__tabs-box">
-        <Tabs defaultActiveKey="1" items={items} centered size="large" />
+        <Tabs defaultActiveKey="1" items={items} centered size="large" onTabClick={updateTab} />
       </div>
       <div className="movie-app__input-box">
-        <Input placeholder="Type to search..." size="large" onChange={onInputChange} />
+        {tab === '1' ? <Input placeholder="Type to search..." size="large" onChange={onInputChange} /> : null}
       </div>
     </header>
   );

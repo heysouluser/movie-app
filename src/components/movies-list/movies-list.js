@@ -10,17 +10,16 @@ export default class MoviesList extends Component {
 
   state = {
     moviesList: [],
-    loading: false,
-    error: false,
+    status: null,
     errorText: '',
-    noMovies: false,
+    ratedMovies: [],
   };
 
   componentDidUpdate(prevProps) {
-    const { searchValue, currentPage, updateCurrentPage } = this.props;
-    if (searchValue !== prevProps.searchValue || currentPage !== prevProps.currentPage) {
+    const { searchValue, currentPage, updateCurrentPage, tab } = this.props;
+    if (searchValue !== prevProps.searchValue || currentPage !== prevProps.currentPage || tab !== prevProps.tab) {
       this.setState({
-        loading: true,
+        status: 'loading',
       });
       this.updateMovies();
     }
@@ -30,40 +29,61 @@ export default class MoviesList extends Component {
   }
 
   onMoviesLoaded = (movies) => {
+    const { ratedMovies } = this.state;
+    const updatedMoviesList = movies.results.map((movie) => {
+      const ratedMovie = ratedMovies.find((rated) => rated.id === movie.id);
+      const rating = ratedMovie ? ratedMovie.rating : movie.rating;
+      return {
+        ...movie,
+        rating,
+      };
+    });
     this.setState({
-      moviesList: movies.results,
-      loading: false,
-      noMovies: movies.results.length === 0,
+      moviesList: updatedMoviesList,
+      status: movies.results.length === 0 ? 'noMovies' : null,
     });
   };
 
   onError = (err) => {
     this.setState({
-      error: true,
-      loading: false,
+      status: 'error',
       errorText: err.message,
     });
   };
 
-  // updateMovies = () => {
-  //   const { searchValue, currentPage } = this.props;
-  //   this.tmdbService.getMovies(searchValue, currentPage).then(this.onMoviesLoaded).catch(this.onError);
-  // };
-
-  updateMovies = () => {
-    const { searchValue, currentPage } = this.props;
-    this.tmdbService
-      .getMovies(searchValue, currentPage)
-      .then((movies) => {
+  async updateMovies() {
+    const { searchValue, currentPage, tab } = this.props;
+    try {
+      const ratedMovies = await this.tmdbService.getRatedMovies(currentPage);
+      const movies = await this.tmdbService.getMovies(searchValue, currentPage);
+      this.setState({ ratedMovies: ratedMovies.results });
+      if (tab === '1') {
         this.onMoviesLoaded(movies);
         this.props.getTotalPages(movies.total_pages * 10);
-      })
-      .catch(this.onError);
-  };
+      } else if (tab === '2') {
+        if (ratedMovies.results.length === 0) {
+          throw new Error('Please, rate any movie');
+        }
+        this.onMoviesLoaded(ratedMovies);
+        this.props.getTotalPages(ratedMovies.total_pages * 10);
+      }
+    } catch (error) {
+      this.onError(error);
+    }
+  }
 
   renderMovies = (moviesList) =>
     moviesList.map((item) => {
-      const { id, title, release_date: releaseDate, poster_path: posterPath, overview } = item;
+      const {
+        id,
+        title,
+        release_date: releaseDate,
+        poster_path: posterPath,
+        overview,
+        genre_ids: genreId,
+        rating,
+        vote_average: voteAverage,
+      } = item;
       return (
         <MovieCard
           key={id}
@@ -72,27 +92,31 @@ export default class MoviesList extends Component {
           releaseDate={releaseDate}
           posterPath={posterPath}
           loading={this.state.loading}
+          genreId={genreId}
+          rating={rating}
+          voteAverage={voteAverage}
+          addRating={(value) => this.tmdbService.addRating(id, value)}
         />
       );
     });
 
   render() {
-    const { moviesList, loading, error, errorText, noMovies } = this.state;
+    const { moviesList, status, errorText } = this.state;
     const { searchValue } = this.props;
     const alertMovies = <Alert message="No results" description="Please enter another movie" type="warning" showIcon />;
-    const hasData = !(loading || error || noMovies);
+    const hasData = status === null;
 
-    const errorMessage = error ? <Alert message={errorText} type="error" /> : null;
-    const spinner = loading ? <Spin size="large" /> : null;
+    if (status === 'error') {
+      return <Alert message={errorText} type="error" />;
+    }
+    if (status === 'loading') {
+      return <Spin size="large" />;
+    }
+    if (status === 'noMovies' && searchValue !== '') {
+      return alertMovies;
+    }
     const content = hasData ? this.renderMovies(moviesList) : null;
-    const warningContent = noMovies && searchValue !== '' && !loading ? alertMovies : null;
-    return (
-      <div className="movie-list">
-        {errorMessage}
-        {spinner}
-        {content}
-        {warningContent}
-      </div>
-    );
+
+    return <div className="movie-list">{content}</div>;
   }
 }
